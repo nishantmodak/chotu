@@ -22,30 +22,31 @@ class RequestProcessor
   end
 
   def send_response
-    puts "SEND RESPONSE"
+    puts 'send_response'
     env = parsed_data_to_env
     status, headers, body = @app.call env
     @socket.write "HTTP/#{@parser.http_version.join(".")} #{status} #{Chotu::HTTP_STATUS[status]}\r\n"
-
     headers.each_pair { |key, value| @socket.write "#{key}: #{value}\r\n" }
     @socket.write "\r\n"
-    body.each { |piece| @socket.write piece }
+    body.each { |piece| @socket.write piece } 
     body.close if body.respond_to? :close
   end
 
   def parsed_data_to_env
+    puts 'parsed_data_to_env'
     env = {}
     @parser.headers.each_pair do |key, value|
       env["HTTP_#{key.upcase.gsub('-', '_')}"] = value
     end
     env['PATH_INFO'] = @parser.request_url
     env['REQUEST_METHOD'] = @parser.http_method
-    env['rack.input'] = StringIO.new
+    env['rack.input'] = ' '
     puts env
     env
   end
 
   def close_socket
+    puts 'close_socket'
     @socket.close
   end
 end
